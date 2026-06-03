@@ -110,7 +110,18 @@ pywrap_aware_tf_cc_shared_object = _pywrap_aware_tf_cc_shared_object
 pywrap_aware_filegroup = _pywrap_aware_filegroup
 pywrap_aware_genrule = _pywrap_aware_genrule
 pywrap_aware_cc_import = _pywrap_aware_cc_import
-pywrap_library = _pywrap_library
+
+def pywrap_library(name, deps = [], **kwargs):
+    if name == "_pywrap_tensorflow":
+        deps = deps + select({
+            clean_dep("//tensorflow:windows"): [
+                clean_dep("//tensorflow/core/framework:op_def_builder"),
+                clean_dep("//tensorflow/python/eager:pywrap_tfe_lib"),
+            ],
+            "//conditions:default": [],
+        })
+    _pywrap_library(name = name, deps = deps, **kwargs)
+
 pywrap_common_library = _pywrap_common_library
 stripped_cc_info = _stripped_cc_info
 pywrap_binaries = _pywrap_binaries
