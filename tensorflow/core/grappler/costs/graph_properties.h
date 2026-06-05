@@ -25,6 +25,7 @@ limitations under the License.
 #include "tensorflow/core/grappler/clusters/cluster.h"
 #include "tensorflow/core/grappler/costs/op_performance_data.pb.h"
 #include "tensorflow/core/grappler/grappler_item.h"
+#include "tensorflow/core/platform/macros.h"
 
 namespace tensorflow {
 

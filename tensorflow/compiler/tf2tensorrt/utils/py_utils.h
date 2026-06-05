@@ -19,6 +19,8 @@ limitations under the License.
 #include <string>
 #include <vector>
 
+#include "tensorflow/core/platform/macros.h"
+
 namespace tensorflow {
 namespace tensorrt {
 

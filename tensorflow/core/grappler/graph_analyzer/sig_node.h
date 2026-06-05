@@ -27,6 +27,7 @@ limitations under the License.
 #include "tensorflow/core/grappler/graph_analyzer/gen_node.h"
 #include "tensorflow/core/grappler/graph_analyzer/hash_tools.h"
 #include "tensorflow/core/lib/core/status.h"
+#include "tensorflow/core/platform/macros.h"
 #include "tensorflow/core/protobuf/meta_graph.pb.h"
 
 namespace tensorflow {
@@ -247,6 +248,12 @@ class SigNode {
 // Signature of a graph. The computation is intertwined with the private methods
 // of SigNode, so keeping both in the same file looks more convenient.
 struct Signature {
+  Signature();
+  Signature(const Signature&) = delete;
+  Signature& operator=(const Signature&) = delete;
+  Signature(Signature&&);
+  Signature& operator=(Signature&&);
+
   friend class test::SigBaseTest;
 
   // Maximal size of the graphs for which the signature can be computed.

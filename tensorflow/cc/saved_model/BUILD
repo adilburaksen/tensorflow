@@ -417,6 +417,7 @@ cc_library(
     hdrs = ["metrics.h"],
     visibility = [
         "//tensorflow/cc/saved_model/image_format:__subpackages__",
+        "//tensorflow/python:__pkg__",
         "//tensorflow/python/saved_model:__subpackages__",
     ],
     deps = if_static([

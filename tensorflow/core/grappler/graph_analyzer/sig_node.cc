@@ -207,6 +207,10 @@ bool SigNode::operator==(const SigNode& other) const {
 
 //=== Signature
 
+Signature::Signature() = default;
+Signature::Signature(Signature&&) = default;
+Signature& Signature::operator=(Signature&&) = default;
+
 constexpr int Signature::kMaxGraphSize;
 
 std::string Signature::ToString() const {

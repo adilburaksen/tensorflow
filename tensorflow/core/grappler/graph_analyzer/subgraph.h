@@ -24,27 +24,35 @@ limitations under the License.
 #include "tensorflow/core/grappler/graph_analyzer/map_tools.h"
 #include "tensorflow/core/grappler/graph_analyzer/sig_node.h"
 #include "tensorflow/core/lib/gtl/flatset.h"
+#include "tensorflow/core/platform/macros.h"
 
 namespace tensorflow {
 namespace grappler {
 namespace graph_analyzer {
 
+// Identity of a single subgraph as a set of nodes.
+class Identity : public gtl::FlatSet<const GenNode*> {
+ public:
+  using InitializerList = std::initializer_list<GenNode*>;
+
+  Identity();
+  Identity(const Identity&);
+  Identity& operator=(const Identity&);
+  Identity(Identity&&);
+  Identity& operator=(Identity&&);
+
+  Identity(InitializerList init);
+  bool operator<(const Identity& other) const;
+  bool operator==(const Identity& other) const;
+
+  // Compute the hash.
+  size_t Hash() const;
+};
+
 // The description of a single subgraph for processing.
 class Subgraph {
  public:
-  // Identity of a single subgraph as a set of nodes.
-  class Identity : public gtl::FlatSet<const GenNode*> {
-   public:
-    using InitializerList = std::initializer_list<GenNode*>;
-
-    Identity() = default;
-    Identity(InitializerList init);
-    bool operator<(const Identity& other) const;
-    bool operator==(const Identity& other) const;
-
-    // Compute the hash.
-    size_t Hash() const;
-  };
+  using Identity = Identity;
 
   explicit Subgraph(Identity id) : id_(std::move(id)), hash_(id_.Hash()) {}
 

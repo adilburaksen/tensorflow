@@ -1039,7 +1039,9 @@ tf_cuda_library(
         "@local_config_tensorrt//:use_static_tensorrt": ["TF_USE_TENSORRT_STATIC=1"],
         "//conditions:default": [],
     }),
-    deps = if_tensorrt([
+    deps = [
+        "//tensorflow/core/platform:macros",
+    ] + if_tensorrt([
         ":common_utils",
         ":tensorrt_lib",
         ":op_converter_registry",

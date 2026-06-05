@@ -21,6 +21,7 @@ limitations under the License.
 
 #include "absl/status/statusor.h"
 #include "absl/strings/string_view.h"
+#include "tensorflow/core/platform/macros.h"
 
 namespace mlir::tensorflow_to_stablehlo::pywrap {
 

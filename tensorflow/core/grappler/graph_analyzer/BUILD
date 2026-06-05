@@ -30,6 +30,7 @@ cc_library(
         "//tensorflow/core:tensorflow",
         "//tensorflow/core/grappler:op_types",
         "//tensorflow/core/grappler:utils",
+        "//tensorflow/core/platform:macros",
         "@com_google_absl//absl/log",
         "@com_google_absl//absl/log:check",
         "@com_google_absl//absl/memory",
@@ -37,6 +38,7 @@ cc_library(
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -54,6 +56,7 @@ cc_library(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
     ],
+    alwayslink = True,
 )
 
 cc_library(

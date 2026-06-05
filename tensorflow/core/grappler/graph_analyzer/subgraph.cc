@@ -32,15 +32,21 @@ namespace tensorflow {
 namespace grappler {
 namespace graph_analyzer {
 
-//=== Subgraph::Identity
+//=== Identity
 
-Subgraph::Identity::Identity(InitializerList init) {
+Identity::Identity() = default;
+Identity::Identity(const Identity&) = default;
+Identity& Identity::operator=(const Identity&) = default;
+Identity::Identity(Identity&&) = default;
+Identity& Identity::operator=(Identity&&) = default;
+
+Identity::Identity(InitializerList init) {
   for (auto element : init) {
     insert(element);
   }
 }
 
-bool Subgraph::Identity::operator<(const Identity& other) const {
+bool Identity::operator<(const Identity& other) const {
   // Shorter sets go first.
   if (this->size() < other.size()) {
     return true;
@@ -60,7 +66,7 @@ bool Subgraph::Identity::operator<(const Identity& other) const {
   return false;  // Equal.
 }
 
-bool Subgraph::Identity::operator==(const Identity& other) const {
+bool Identity::operator==(const Identity& other) const {
   if (this->size() != other.size()) {
     return false;
   }
@@ -73,7 +79,7 @@ bool Subgraph::Identity::operator==(const Identity& other) const {
   return true;  // Equal.
 }
 
-size_t Subgraph::Identity::Hash() const {
+size_t Identity::Hash() const {
   std::hash<const GenNode*> hasher;
   size_t result = 0;
   for (auto ptr : *this) {

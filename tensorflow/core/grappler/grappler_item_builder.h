@@ -22,6 +22,7 @@ limitations under the License.
 
 #include "tensorflow/core/framework/attr_value.pb.h"
 #include "tensorflow/core/grappler/grappler_item.h"
+#include "tensorflow/core/platform/macros.h"
 
 namespace tensorflow {
 
