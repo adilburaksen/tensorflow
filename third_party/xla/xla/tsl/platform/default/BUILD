@@ -713,3 +713,9 @@ exports_files(
         "//tensorflow/core/platform:__pkg__",
     ]),
 )
+
+filegroup(
+    name = "builddata_srcs",
+    srcs = ["builddata.cc"],
+    visibility = ["//xla/tsl/builddata:__pkg__"],
+)
