@@ -13,6 +13,7 @@ load(
 load(
     "//xla/tsl:tsl.default.bzl",
     "filegroup",
+    "get_compatible_with_portable",
     "if_cuda_tools",
 )
 load("//xla/tsl/platform:rules_cc.bzl", "cc_library")
@@ -45,7 +46,6 @@ cc_library(
 
 cc_library(
     name = "context",
-    hdrs = ["@tsl//tsl/platform:context.h"],
     tags = [
         "manual",
         "no_oss",
@@ -55,6 +55,7 @@ cc_library(
     textual_hdrs = ["context.h"],
     deps = [
         "@tsl//tsl/platform",
+        "@tsl//tsl/platform:context_hdrs_lib",
     ],
 )
 
@@ -75,7 +76,6 @@ cc_library(
 cc_library(
     name = "cuda_root_path",
     srcs = ["cuda_root_path.cc"],
-    hdrs = ["@tsl//tsl/platform:cuda_root_path.h"],
     compatible_with = [],
     data = if_cuda_tools(if_cuda_newer_than(
         "13_0",
@@ -101,8 +101,10 @@ cc_library(
         "@com_google_absl//absl/strings",
         "@local_config_cuda//cuda:cuda_headers",
         "@tsl//tsl/platform",
+        "@tsl//tsl/platform:cuda_root_path_hdrs_lib",
         "@tsl//tsl/platform:path",
     ],
+    alwayslink = 1,
 )
 
 cc_library(
@@ -252,7 +254,6 @@ cc_library(
 cc_library(
     name = "error_logging",
     srcs = ["error_logging.cc"],
-    hdrs = ["@tsl//tsl/platform:error_logging.h"],
     tags = [
         "manual",
         "no_oss",
@@ -261,7 +262,9 @@ cc_library(
     deps = [
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
+        "@tsl//tsl/platform:error_logging_hdrs_lib",
     ],
+    alwayslink = 1,
 )
 
 cc_library(
@@ -283,7 +286,6 @@ cc_library(
 cc_library(
     name = "human_readable_json",
     srcs = ["human_readable_json.cc"],
-    hdrs = ["@tsl//tsl/platform:human_readable_json.h"],
     tags = [
         "manual",
         "no_oss",
@@ -294,16 +296,17 @@ cc_library(
         "//xla/tsl/platform:types",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
+        "@tsl//tsl/platform:human_readable_json_hdrs_lib",
         "@tsl//tsl/platform:protobuf",
         "@tsl//tsl/platform:strcat",
         "@tsl//tsl/platform:stringpiece",
     ],
+    alwayslink = 1,
 )
 
 cc_library(
     name = "load_library",
     srcs = ["load_library.cc"],
-    hdrs = ["@tsl//tsl/platform:load_library.h"],
     linkstatic = True,
     tags = [
         "manual",
@@ -313,9 +316,11 @@ cc_library(
     deps = [
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings:string_view",
+        "@tsl//tsl/platform:load_library_hdrs_lib",
     ] + if_rocm_is_configured([
         "@local_config_rocm//rocm:rocm_rpath",
     ]),
+    alwayslink = 1,
 )
 
 filegroup(
@@ -349,7 +354,6 @@ cc_library(
     name = "platform_port",
     srcs = [
         "port.cc",
-        "@tsl//tsl/platform:cpu_info.cc",
     ] + select({
         "//xla/tsl:with_numa_support": [
             "//xla/tsl/platform:numa_hwloc.cc",
@@ -360,13 +364,6 @@ cc_library(
     }),
     hdrs = [
         "//xla/tsl/platform/profile_utils:cpu_utils.h",
-        "@tsl//tsl/platform:cpu_info.h",
-        "@tsl//tsl/platform:demangle.h",
-        "@tsl//tsl/platform:host_info.h",
-        "@tsl//tsl/platform:init_main.h",
-        "@tsl//tsl/platform:mem.h",
-        "@tsl//tsl/platform:numa.h",
-        "@tsl//tsl/platform:snappy.h",
     ],
     copts = tsl_copts(),
     defines = ["TF_USE_SNAPPY"],
@@ -389,6 +386,8 @@ cc_library(
         "@com_google_absl//absl/time",
         "@snappy",
         "@tsl//tsl/platform",
+        "@tsl//tsl/platform:cpu_info",
+        "@tsl//tsl/platform:platform_port_hdrs_lib",
     ] + select({
         "//xla/tsl:with_numa_support": [
             "@com_google_absl//absl/log",
@@ -444,11 +443,11 @@ cc_library(
 cc_library(
     name = "stacktrace_handler",
     srcs = ["stacktrace_handler.cc"],
-    hdrs = ["@tsl//tsl/platform:stacktrace_handler_hdrs"],
     linkstatic = 1,
     deps = [
         "@tsl//tsl/platform",
         "@tsl//tsl/platform:stacktrace",
+        "@tsl//tsl/platform:stacktrace_handler_hdrs_lib",
     ],
     alwayslink = 1,
 )
@@ -480,26 +479,34 @@ cc_library(
 )
 
 cc_library(
+    name = "tracing_impl",
+    compatible_with = get_compatible_with_portable(),
+    textual_hdrs = ["tracing_impl.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//xla/tsl/profiler/backends/cpu:threadpool_listener_state",
+    ],
+)
+
+cc_library(
     name = "tracing",
     srcs = [
         "tracing.cc",
-        "@tsl//tsl/platform:tracing.cc",
     ],
-    hdrs = ["@tsl//tsl/platform:tracing.h"],
     tags = [
         "manual",
         "no_oss",
         "nobuilder",
         "nofixdeps",
     ],
-    textual_hdrs = ["tracing_impl.h"],
     deps = [
         "//xla/tsl/platform:macros",
         "//xla/tsl/platform:types",
         "//xla/tsl/profiler/backends/cpu:threadpool_listener_state",
-        "@tsl//tsl/platform",
         "@tsl//tsl/platform:hash",
         "@tsl//tsl/platform:stringpiece",
+        "@tsl//tsl/platform:tracing_base",
+        "@tsl//tsl/platform:tracing_hdrs_lib",
     ],
     alwayslink = True,
 )
