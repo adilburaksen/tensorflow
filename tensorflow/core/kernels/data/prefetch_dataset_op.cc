@@ -459,7 +459,25 @@ class PrefetchDatasetOp::Dataset : public DatasetBase {
       // (if we successfully got an element) the output values.
       absl::Status s = buffer_.front().status;
       if (s.ok()) {
-        int64_t buffer_element_id = buffer_.front().uid;
+        uint64_t buffer_element_id = buffer_.front().uid;
+
+        // 1. Calculate the exact time this element sat in the buffer
+        int64_t residence_time_us =
+            EnvTime::NowMicros() - buffer_.front().created_us;
+
+        // 2. Record it to our Histogram
+        metrics::RecordTFDataPrefetchResidenceTime(dataset()->node_name(),
+                                                   residence_time_us);
+
+        // 3. Log extreme severity outliers (e.g., > 10 seconds)
+        if (residence_time_us > 10000000) {
+          LOG_EVERY_N_SEC(WARNING, 10)
+              << "SEVERE STARVATION: Element UID " << buffer_element_id
+              << " in buffer '" << dataset()->node_name()
+              << "' sat unconsumed for " << (residence_time_us / 1000000.0)
+              << " seconds!";
+        }
+
         tsl::profiler::TraceMe traceme(
             [&] {
               return tsl::profiler::TraceMeEncode(
